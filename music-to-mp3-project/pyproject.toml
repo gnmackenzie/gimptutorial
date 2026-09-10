@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "music-to-mp3"
+version = "1.0.0"
+description = "Copy MP3 files and convert selected FLAC files to MP3."
+readme = "README.md"
+requires-python = ">=3.14"
+license = "MIT"
+authors = [{ name = "Graham Mackenzie" }]
+dependencies = [
+    "mutagen>=1.47,<2",
+    "rich>=14,<15",
+    "typer>=0.17,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.17,<2",
+    "pytest>=8.4,<9",
+    "ruff>=0.12,<1",
+]
+
+[project.scripts]
+music-to-mp3 = "music_to_mp3.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/music_to_mp3"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+packages = ["music_to_mp3"]

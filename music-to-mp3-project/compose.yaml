@@ -1,0 +1,17 @@
+services:
+  music-to-mp3:
+    build:
+      context: .
+    image: music-to-mp3:local
+    volumes:
+      - /srv/music/source:/music/source:ro
+      - /srv/music/output:/music/output
+      - ./config:/config:ro
+    command:
+      - /music/source
+      - /music/output
+      - /config/selections.txt
+      - --workers
+      - "4"
+      - --quality
+      - "0"

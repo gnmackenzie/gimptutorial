@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}New export · Music Export{% endblock %}
+{% block content %}
+<h1>New export</h1>
+<form action="/jobs" method="post" enctype="multipart/form-data" class="stack">
+<section class="card">
+<h2>Choose music</h2>
+<label>Search the library<input type="search" name="q" value="{{ query }}" placeholder="Artist or album" hx-get="/library/results" hx-trigger="input changed delay:300ms, search" hx-target="#library-results" hx-include="this"></label>
+<div id="library-results">{% include "partials/library_results.html" %}</div>
+<p class="or">or</p>
+<label>Upload selection file<input type="file" name="selection_file" accept=".txt,text/plain"></label>
+<p class="hint">One artist or Artist/Album per line. Blank lines and lines starting with # are ignored.</p>
+</section>
+<section class="card"><h2>Output</h2>
+<label>Destination<select name="destination">{% for item in settings.destinations() %}<option value="{{ item.key }}">{{ item.label }}</option>{% endfor %}</select></label>
+<div class="grid"><label>MP3 quality<select name="quality">{% for value in range(10) %}<option value="{{ value }}" {% if value == 0 %}selected{% endif %}>{{ value }}{% if value == 0 %} · highest{% endif %}</option>{% endfor %}</select></label><label class="check"><input type="checkbox" name="overwrite" value="true"> Replace existing output files</label></div>
+</section>
+<button class="button primary" type="submit">Start export</button>
+</form>
+{% endblock %}

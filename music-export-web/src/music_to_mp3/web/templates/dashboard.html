@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Jobs · Music Export{% endblock %}
+{% block content %}
+<section class="heading"><div><h1>Export jobs</h1><p>Copy MP3 files and convert FLAC files from the NAS music library.</p></div><a class="button" href="/library">New export</a></section>
+<section class="card">
+{% if jobs %}
+<table><thead><tr><th>Created</th><th>Destination</th><th>Status</th><th>Progress</th></tr></thead><tbody>
+{% for job in jobs %}<tr><td><a href="/jobs/{{ job.id }}">{{ job.created_at[:19].replace('T', ' ') }}</a></td><td>{{ job.destination_key }}</td><td><span class="status {{ job.status }}">{{ job.status }}</span></td><td>{{ job.processed_files }} / {{ job.total_files }}</td></tr>{% endfor %}
+</tbody></table>
+{% else %}<p>No jobs have been submitted.</p>{% endif %}
+</section>
+{% endblock %}

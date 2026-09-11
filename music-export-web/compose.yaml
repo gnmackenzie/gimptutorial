@@ -1,0 +1,34 @@
+services:
+  music-export:
+    build:
+      context: .
+      args:
+        APP_UID: "1026"
+        APP_GID: "100"
+    image: music-export:local
+    container_name: music-export
+    restart: unless-stopped
+    ports:
+      - "8787:8000"
+    environment:
+      TZ: Australia/Sydney
+      MUSIC_EXPORT_SOURCE_ROOT: /music/source
+      MUSIC_EXPORT_DATA_ROOT: /app/data
+      MUSIC_EXPORT_DOWNLOAD_ROOT: /app/downloads
+      MUSIC_EXPORT_NAS_OUTPUT: /destinations/nas
+      MUSIC_EXPORT_USB_OUTPUT: /destinations/usb
+      MUSIC_EXPORT_USB_MARKER: .music-export-usb
+      MUSIC_EXPORT_CONVERSION_WORKERS: "4"
+      MUSIC_EXPORT_MAX_ACTIVE_JOBS: "1"
+      MUSIC_EXPORT_DOWNLOAD_RETENTION_HOURS: "24"
+    volumes:
+      - /volume1/docker/music-export/data:/app/data
+      - /volume1/docker/music-export/downloads:/app/downloads
+      - /volume1/music:/music/source:ro
+      - /volume1/music-exports:/destinations/nas
+      # Confirm the actual USB host path in DSM before deploying.
+      - /volumeUSB1/usbshare:/destinations/usb
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

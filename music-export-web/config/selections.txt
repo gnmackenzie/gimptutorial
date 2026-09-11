@@ -1,0 +1,5 @@
+# A line containing only an artist includes every album by that artist.
+Pink Floyd
+
+# Artist/Album includes only the specified album.
+David Bowie/Low

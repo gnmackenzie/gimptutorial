@@ -1,0 +1,8 @@
+<section id="job-status" class="card" {% if job.status not in ['completed','failed','cancelled','ready'] %}hx-get="/jobs/{{ job.id }}/status" hx-trigger="every 2s" hx-swap="outerHTML"{% endif %}>
+<div class="status-row"><span class="status {{ job.status }}">{{ job.status }}</span><strong>{{ job.processed_files }} / {{ job.total_files }}</strong></div>
+{% set percent = (job.processed_files * 100 / job.total_files) if job.total_files else 0 %}<progress value="{{ job.processed_files }}" max="{{ job.total_files if job.total_files else 1 }}"></progress><p>{{ percent|round(1) }}%</p>
+<div class="metrics"><span>{{ job.copied_files }} copied</span><span>{{ job.converted_files }} converted</span><span>{{ job.skipped_files }} skipped</span><span>{{ job.failed_files }} failed</span></div>
+{% if job.current_file %}<p class="current">{{ job.current_file }}</p>{% endif %}
+{% if job.error %}<p class="error">{{ job.error }}</p>{% endif %}
+{% if job.status == 'ready' %}<a class="button primary" href="/jobs/{{ job.id }}/download">Download ZIP</a>{% elif job.status not in ['completed','failed','cancelled'] %}<form action="/jobs/{{ job.id }}/cancel" method="post"><button class="button danger" type="submit">Cancel</button></form>{% endif %}
+</section>

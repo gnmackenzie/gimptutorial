@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Job {{ job.id[:8] }} · Music Export{% endblock %}
+{% block content %}
+<section class="heading"><div><h1>Job {{ job.id[:8] }}</h1><p>Destination: {{ job.destination_key }}</p></div></section>
+{% include "partials/job_status.html" %}
+{% if events %}<section class="card"><h2>Events</h2><ul class="events">{% for event in events %}<li class="{{ event.level }}"><time>{{ event.created_at[:19].replace('T', ' ') }}</time> {{ event.message }}</li>{% endfor %}</ul></section>{% endif %}
+{% endblock %}

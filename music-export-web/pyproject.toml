@@ -1,0 +1,60 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "music-export"
+version = "2.0.0"
+description = "FastAPI service and CLI for selective music library exports."
+readme = "README.md"
+requires-python = ">=3.14"
+license = "MIT"
+authors = [{ name = "Graham Mackenzie" }]
+dependencies = [
+    "fastapi>=0.141,<1",
+    "jinja2>=3.1,<4",
+    "mutagen>=1.47,<2",
+    "pydantic-settings>=2.10,<3",
+    "python-multipart>=0.0.20,<1",
+    "rich>=14,<15",
+    "typer>=0.17,<1",
+    "uvicorn[standard]>=0.35,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "httpx>=0.28,<1",
+    "mypy>=1.17,<2",
+    "pytest>=8.4,<9",
+    "ruff>=0.12,<1",
+]
+
+[project.scripts]
+music-to-mp3 = "music_to_mp3.cli:app"
+music-export-web = "music_to_mp3.web.run:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/music_to_mp3"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/music_to_mp3/web/templates" = "music_to_mp3/web/templates"
+"src/music_to_mp3/web/static" = "music_to_mp3/web/static"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+packages = ["music_to_mp3"]

@@ -1,0 +1,6 @@
+[
+  "tests/test_encrypted_session_store.py::test_rotation_uses_new_primary_key",
+  "tests/test_encrypted_session_store.py::test_state_is_encrypted_and_round_trips",
+  "tests/test_encrypted_session_store.py::test_wrong_key_cannot_decrypt",
+  "tests/test_mqtt_schema.py::test_placeholder_message_is_valid"
+]

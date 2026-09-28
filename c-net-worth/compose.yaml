@@ -1,0 +1,106 @@
+services:
+  web:
+    build: .
+    command: ["fastapi", "run", "app/main.py", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      # Bind to the NAS LAN address in .env, not 0.0.0.0.
+      - "${HOME_LAN_BIND_IP:-127.0.0.1}:${WEB_PORT:-8080}:8000"
+    environment: &common_environment
+      DATABASE_URL: postgresql+psycopg://networth@postgres:5432/networth
+      LOG_DIRECTORY: /app/logs
+      SECRET_KEY_FILE: /run/secrets/app_secret_key
+      SESSION_ENCRYPTION_KEYS_FILE: /run/secrets/session_encryption_keys
+      DATABASE_PASSWORD_FILE: /run/secrets/database_password
+      MQTT_BROKER_HOST: ${MQTT_BROKER_HOST}
+      MQTT_BROKER_PORT: ${MQTT_BROKER_PORT:-8883}
+      MQTT_TOPIC: ${MQTT_TOPIC}
+      MQTT_TLS_ENABLED: ${MQTT_TLS_ENABLED:-true}
+      MQTT_USERNAME_FILE: /run/secrets/mqtt_username
+      MQTT_PASSWORD_FILE: /run/secrets/mqtt_password
+      FUND_ONE_USERNAME_FILE: /run/secrets/fund_one_username
+      FUND_ONE_PASSWORD_FILE: /run/secrets/fund_one_password
+      FUND_TWO_USERNAME_FILE: /run/secrets/fund_two_username
+      FUND_TWO_PASSWORD_FILE: /run/secrets/fund_two_password
+    secrets: &app_secrets
+      - app_secret_key
+      - database_password
+      - session_encryption_keys
+      - mqtt_username
+      - mqtt_password
+      - fund_one_username
+      - fund_one_password
+      - fund_two_username
+      - fund_two_password
+    volumes:
+      - ./logs:/app/logs
+      - provider_state:/app/data/provider-state
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [frontend, backend]
+
+  mqtt-listener:
+    build: .
+    command: ["python", "-m", "app.integrations.mqtt.runner"]
+    environment: *common_environment
+    secrets: *app_secrets
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [backend]
+
+  refresh-worker:
+    build: .
+    command: ["python", "-m", "app.integrations.superannuation.runner"]
+    environment: *common_environment
+    secrets: *app_secrets
+    volumes:
+      - ./logs:/app/logs
+      - provider_state:/app/data/provider-state
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [backend]
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: networth
+      POSTGRES_USER: networth
+      POSTGRES_PASSWORD_FILE: /run/secrets/database_password
+    secrets:
+      - database_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U networth -d networth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks: [backend]
+
+secrets:
+  app_secret_key: {file: ./secrets/app_secret_key}
+  database_password: {file: ./secrets/database_password}
+  session_encryption_keys: {file: ./secrets/session_encryption_keys}
+  mqtt_username: {file: ./secrets/mqtt_username}
+  mqtt_password: {file: ./secrets/mqtt_password}
+  fund_one_username: {file: ./secrets/fund_one_username}
+  fund_one_password: {file: ./secrets/fund_one_password}
+  fund_two_username: {file: ./secrets/fund_two_username}
+  fund_two_password: {file: ./secrets/fund_two_password}
+
+volumes:
+  postgres_data:
+  provider_state:
+
+networks:
+  frontend:
+  backend:
+    internal: true

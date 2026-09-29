@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block content %}<h1>Combined net worth</h1>
+<p class="total">{{ "{:,.2f}".format(total) }} AUD</p><p><a href="/accounts/new">Add deposit account</a></p>
+<table><thead><tr><th>Type</th><th>Owner</th><th>Institution</th><th>Account</th><th>Balance</th><th>Maturity</th></tr></thead>
+<tbody>{% for item in balances %}<tr><td>{{ item.account.account_type }}</td><td>{{ item.account.owner_label }}</td><td>{{ item.account.institution_name }}</td><td>{{ item.account.account_name }}</td><td>{{ "{:,.2f}".format(item.amount) }}</td><td>{{ item.account.maturity_date or "" }}</td></tr>{% else %}<tr><td colspan="6">No balances recorded.</td></tr>{% endfor %}</tbody></table>{% endblock %}

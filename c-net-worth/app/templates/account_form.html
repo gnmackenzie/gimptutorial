@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block content %}<h1>Add deposit account</h1>
+<form method="post" action="/accounts"><label>Type<select name="account_type"><option>SAVINGS</option><option>TRANSACTION</option><option>TERM_DEPOSIT</option></select></label>
+<label>Owner<input name="owner_label" placeholder="Joint" required></label><label>Institution<input name="institution_name" required></label>
+<label>Account name<input name="account_name" required></label><label>Balance<input name="balance" type="number" min="0" step="0.01" required></label>
+<label>Maturity date<input name="maturity_date" type="date"></label><button>Save</button></form>{% endblock %}
